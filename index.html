@@ -267,6 +267,42 @@ body { padding-top: var(--cg-strip-h); }
 .cg-colophon-note { margin: 4px 0 0; color: #9a9aa8; }
 @media (max-width: 640px) { .cg-strip-label { display: none; } }
 @media (prefers-reduced-motion: reduce) { .cg-skip { transition: none; } }
+
+/* ---- Mobile reading view (touch / small screens) ------------------------------------- */
+/* The immersive per-구 template is desktop-only. On touch devices and narrow screens the
+   .cg-read view is shown instead — it uses only safe, high-contrast CSS so text can never
+   go invisible on iOS Safari (no background-clip:text, backdrop-filter, 100vh, :hover-gated
+   reveals, or mix-blend-mode). Fully namespaced + generator-controlled. */
+.cg-read { display: none; }
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
+  /* Neutralise immersive templates that lock scrolling / lock the viewport on <body>. */
+  html, body { overflow-x: hidden !important; overflow-y: auto !important; height: auto !important;
+    min-height: 0 !important; position: static !important; touch-action: auto !important; background: #ffffff !important; }
+  .cg-immersive { display: none !important; }
+  .cg-read { display: block; }
+}
+.cg-read { max-width: 720px; margin: 0 auto; padding: 20px 18px 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color: #17171f; background: #ffffff; line-height: 1.75; -webkit-text-size-adjust: 100%; }
+.cg-read * { max-width: 100%; box-sizing: border-box; }
+.cg-read-head { padding: 8px 0 16px; border-bottom: 3px solid var(--cg-ra, #2d5bff); margin-bottom: 20px; }
+.cg-read-eyebrow { margin: 0 0 4px; color: var(--cg-rd, #333); font-weight: 700; font-size: 15px; letter-spacing: .02em; }
+.cg-read-head h1 { margin: 0; font-size: clamp(30px, 8vw, 40px); line-height: 1.15; color: #14141c; font-weight: 800; }
+.cg-read h2 { font-size: 20px; margin: 30px 0 10px; padding-left: 11px; color: #14141c; font-weight: 700;
+  border-left: 5px solid var(--cg-ra, #2d5bff); }
+.cg-read p { margin: 0 0 12px; font-size: 17px; color: #23232d; }
+.cg-read section { margin: 0; }
+.cg-read ul { margin: 8px 0 0; padding-left: 20px; }
+.cg-read li { margin: 8px 0; font-size: 16px; color: #23232d; }
+.cg-read li strong { color: #111119; font-weight: 700; }
+.cg-read .facts, .cg-read .symbols { list-style: none; padding: 14px 16px; margin: 8px 0 0;
+  background: #f5f6fa; border: 1px solid #e6e8f0; border-radius: 12px; }
+.cg-read .faq details { border: 1px solid #e6e8f0; border-radius: 10px; padding: 10px 14px; margin: 8px 0; background: #fbfbfd; }
+.cg-read .faq summary { cursor: pointer; font-weight: 700; font-size: 16px; color: #14141c; }
+.cg-read .faq details p { margin: 8px 0 2px; color: #44454f; }
+.cg-read a { color: #1a46d8; word-break: break-word; }
+.cg-read .sources { font-size: 14px; color: #55565f; }
+.cg-read .sources a { color: #3a5bd0; }
 </style>
 </head>
 <body>
@@ -275,6 +311,7 @@ body { padding-top: var(--cg-strip-h); }
     <span class="cg-ad">AD</span><span class="cg-strip-label">후원 파트너</span><span class="cg-strip-list"><a class="cg-strip-item" href="https://ikoffices.com" rel="sponsored noopener" target="_blank">일광오피스</a><span class="cg-strip-dot" aria-hidden="true">·</span><a class="cg-strip-item" href="https://mobidicsaju.com" rel="sponsored noopener" target="_blank">모비딕 사주</a><span class="cg-strip-dot" aria-hidden="true">·</span><a class="cg-strip-item" href="https://www.foodskorea.com/" rel="sponsored noopener" target="_blank">전국팔도 식품도감</a><span class="cg-strip-dot" aria-hidden="true">·</span><a class="cg-strip-item" href="https://myflowmakers.com" rel="sponsored noopener" target="_blank">마이플로우메이커스</a><span class="cg-strip-dot" aria-hidden="true">·</span><a class="cg-strip-item" href="https://yeonlijispace.com" rel="sponsored noopener" target="_blank">연리지 인테리어</a><span class="cg-strip-dot" aria-hidden="true">·</span><a class="cg-strip-item" href="https://yeonliji.io" rel="sponsored noopener" target="_blank">주식회사 연리지</a><span class="cg-strip-dot" aria-hidden="true">·</span><span class="cg-strip-item cg-strip-text">세무·법률 자문</span></span>
   </aside>
   <div id="cg-main" tabindex="-1"></div>
+  <div class="cg-immersive">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Nanum+Pen+Script&family=Pacifico&display=swap');
 
@@ -857,6 +894,131 @@ body { padding-top: var(--cg-strip-h); }
 
 })();
 </script>
+  </div>
+  <main class="cg-read" id="cg-read" role="main" lang="ko" style="--cg-ra:#ab892b;--cg-ra2:#a3d039;--cg-rd:#574619">
+    <header class="cg-read-head">
+      <p class="cg-read-eyebrow">대구광역시</p>
+      <h1>남구</h1>
+    </header>
+    <div class="cg-read-body">
+      <section id="r-intro">
+        <h2>지역 소개</h2>
+        <p>남구는 대구의 상징인 앞산이 병풍처럼 남쪽을 감싸고, 신천이 동쪽 경계를 따라 흐르는 도심 속 주거·문화 자치구입니다. 안지랑 곱창골목과 앞산카페거리로 대표되는 서민형 먹거리 문화, 대명동 일대의 공연예술 생태계, 이천동 고미술거리의 옛 정취가 어우러져 &#x27;남다른 남구&#x27;라는 별칭을 얻었습니다. 임진왜란 때 귀화한 명나라 장수 두사충이 고국을 그리며 이름 붙였다는 대명동(大明洞) 지명 유래는 전국 어디에도 없는 남구만의 이야기입니다. 대구교육대학교와 영남이공대학교가 자리 잡아 젊은 층 유동이 활발하고, 앞산 케이블카와 전망대는 대구 야경 명소로 이름이 높습니다. 면적은 17.5㎢로 대구 자치구 중에서도 아담하지만, 산과 하천과 문화가 촘촘히 밀집한 것이 남구의 매력입니다.</p>
+      </section>
+      <section id="r-facts">
+        <h2>주요 통계</h2>
+        <ul class="facts">
+          <li>인구: 약 137,566명 (2024)</li>
+          <li>면적: 17.5 km²</li>
+          <li>신설: 1963-01-01</li>
+        </ul>
+      </section>
+      <section id="r-history">
+        <h2>역사</h2>
+        <p>남구 지역은 조선시대부터 대구부의 남쪽 외곽 마을로, 이천동 일대는 오래전부터 군사적 요충지였고 대명동은 명장 두사충이 최정산(현 대덕산) 아래로 집을 옮겨 매월 초하루 고국 명나라를 향해 배례하며 &#x27;대명동&#x27;이라 이름 지었다는 유래가 전합니다. 봉덕동 부근에는 1929년경 대구 지역 최초의 능금 과수원이 있었던 것으로 전해지며, 이천동의 &#x27;이천(梨泉)&#x27;은 배나무와 그 아래 샘에서 흘러 미나리꽝을 이루던 물길에서 비롯된 이름입니다. 1963년 1월 1일 대구시에 구제(區制)가 실시되면서 남구가 정식으로 설치되었습니다. 1981년 대구가 직할시로 승격할 때 달성군 월배 지역이 편입되어 관할이 넓어졌으나, 1988년 달서구가 분리되면서 오늘날의 규모로 정리되었습니다. 1995년 대구광역시 남구로 명칭이 바뀌었으며, 1987년 35만여 명으로 정점을 찍은 뒤 인구가 완만히 줄어 도심 재생과 문화·관광 특화로 방향을 전환해 왔습니다.</p>
+      </section>
+      <section id="r-geography">
+        <h2>지리·자연환경</h2>
+        <p>남구는 대구 도심의 중앙 남쪽에 자리하며, 동쪽으로 신천을 사이에 두고 수성구, 북쪽으로 명덕로를 경계로 중구와 맞닿아 있습니다. 남쪽 경계 전체를 대구의 진산 앞산(앞산공원)이 감싸며, 이 능선 너머로 수성구·달서구·달성군과 이어집니다. 앞산은 대덕산·산성산과 이어지는 비슬산 자락의 북쪽 봉우리로, 은적사·고산골 등 골짜기마다 사찰과 계곡을 품고 있습니다. 저지대는 신천의 범람으로 형성된 충적 평야이며, 모래·자갈이 섞인 사력질 토양으로 물 빠짐이 좋은 것이 특징입니다. 신천은 남구 동편을 남북으로 관통하며 시민들의 하천 산책로와 수변 공간으로 활용됩니다. 산과 하천이 남·동 두 방향을 두르고 그 사이 완만한 평지에 시가지가 형성된 것이 남구의 지형적 골격입니다.</p>
+      </section>
+      <section id="r-characteristics">
+        <h2>지역 특징</h2>
+        <p>남구는 이천동·봉덕동·대명동 3개 법정동을 13개 행정동으로 나누어 관할하며, 그중 대명동이 구 면적의 90% 이상을 차지하는 대표 주거지입니다. 인구는 2024년 기준 약 13만 8천 명 규모로, 1인 세대 비율이 대구에서 가장 높은 축에 들어 대학가·역세권을 중심으로 1인 가구와 청년층이 두텁게 형성돼 있습니다. 대규모 제조업 단지보다는 곱창·막창 등 먹거리 상권, 소극장과 예술기획사가 밀집한 공연문화 산업, 고미술 유통이 지역 경제의 색깔을 이룹니다. 봉덕동에는 오랜 기간 미군기지 캠프 헨리가 자리해 개발이 상대적으로 더뎠던 구역이 있었고, 이는 최근 도심 재생과 문화거리 조성의 배경이 되었습니다. 대구교육대학교·영남이공대학교와 여러 특수학교가 모여 교육 기능이 강한 것도 남구의 성격입니다. 전반적으로 대규모 신시가지보다 골목과 산자락, 대학과 문화가 밀착한 생활 밀착형 자치구로 요약됩니다.</p>
+      </section>
+      <section id="r-landmarks">
+        <h2>대표 명소</h2>
+        <ul>
+          <li><strong>안지랑 곱창골목</strong> — 안지랑오거리에서 앞산 안지랑골로 이어지는 길목에 형성된 대구 대표 먹거리 거리로, 돼지곱창과 막창을 저렴하고 푸짐하게 내는 60여 개 상가가 성업 중입니다. 2018년 &#x27;한국 관광의 별&#x27;에 선정되고 전국 5대 음식테마거리로 지정됐으며, 매년 가을 &#x27;안지랑곱창골 젊음의 거리축제&#x27;가 열립니다. 지하철 1호선 안지랑역에서 걸어서 3분 거리입니다.</li>
+          <li><strong>앞산 전망대와 케이블카</strong> — 앞산 중턱까지 케이블카로 5분이면 오르는 앞산공원 전망대는 대구 시가지와 야경을 한눈에 담는 대표 조망 명소로, 여러 드라마 촬영지로도 알려졌습니다. 등산이 부담스러운 이들도 편하게 대구 전경을 감상할 수 있어 사시사철 데이트·가족 나들이 코스로 인기가 높습니다.</li>
+          <li><strong>이천동 고미술거리</strong> — 1960년대 문화재와 골동품을 사고파는 업소들이 모여들며 형성된 거리로, 고서화·도자기·목가구 등을 취급하는 고미술 상점이 밀집해 도심 속 옛 정취를 간직하고 있습니다. 대구에서 손꼽히는 특별한 문화 공간으로, 이천동의 오랜 역사와 함께 남구만의 아날로그 감성을 전합니다.</li>
+          <li><strong>앞산카페거리</strong> — 앞산 자락을 따라 조성된 카페 밀집 거리로, 곱창골목과 이웃해 안지랑곱창골목·앞산카페거리가 함께 &#x27;한국 관광의 별&#x27;로 선정됐습니다. 산 아래 전망 좋은 카페들이 늘어서 젊은 층과 관광객이 즐겨 찾는 남구의 새로운 명소로 자리 잡았습니다.</li>
+        </ul>
+      </section>
+      <section id="r-heritage">
+        <h2>문화유산·문화시설</h2>
+        <ul>
+          <li><strong>낙동강 승전기념관</strong> — 앞산공원 안에 있는 전쟁기념관으로, 6·25전쟁 당시 대구를 지켜낸 낙동강 방어선 전투의 승리를 기념하고 참전 용사를 기립니다. 총기류를 비롯한 전쟁 관련 전시물을 한자리에 모아 안보·역사 교육의 장으로 활용됩니다.</li>
+          <li><strong>은적사</strong> — 앞산 자락에 자리한 고찰로, 후삼국 시대 왕건이 견훤에게 쫓겨 대웅전 옆 동굴에서 사흘간 몸을 숨겼다는 전설에서 &#x27;자취를 숨긴 절&#x27;이라는 뜻의 은적사(隱跡寺)라는 이름이 유래했다고 전합니다. 왕을 살린 산이라 불리는 앞산 설화의 중심 사찰입니다.</li>
+          <li><strong>대명공연문화거리</strong> — 대명동 일대에 연극 극단, 소극장, 음악가, 개인 화실, 예술기획사, 악기사 등 다양한 장르의 예술인과 단체가 모여 형성된 공연문화 거점입니다. 대구에서 가장 긴 역사를 자랑하는 소극장을 비롯해 공연산업의 자생적 기반이 갖춰져 있어 대구 연극·공연의 심장부로 꼽힙니다.</li>
+          <li><strong>고산골 공룡화석지</strong> — 앞산 고산골 계곡에 남아 있는 중생대 공룡 발자국 화석과 퇴적층으로, 조각공원과 함께 조성돼 자연·지질 학습장이자 가족 나들이 코스로 인기입니다. 도심 가까이에서 공룡 시대의 흔적을 만날 수 있는 남구의 이색 명소입니다.</li>
+        </ul>
+      </section>
+      <section id="r-nature">
+        <h2>자연·휴식</h2>
+        <ul>
+          <li><strong>앞산공원</strong> — 남구 남쪽 전역을 감싸는 대구 대표 도시자연공원으로, 총면적 약 358만㎡ 가운데 상당 부분이 남구에 속합니다. 케이블카와 전망대, 은적사·고산골 등 계곡과 사찰, 산책로가 어우러져 대구 시민의 대표 휴식처이자 등산·야경 명소로 사랑받습니다.</li>
+          <li><strong>앞산맛둘레길</strong> — 앞산 자락을 따라 곱창골목·카페거리·전망대를 잇는 산책 코스로, 걷기 좋은 둘레길과 먹거리·볼거리를 함께 즐길 수 있게 조성됐습니다. 가벼운 나들이부터 본격 산행까지 폭넓게 소화할 수 있는 남구의 대표 걷기길입니다.</li>
+          <li><strong>앞산빨래터공원</strong> — 옛 주민들이 빨래하던 계곡 물길을 활용해 조성한 근린공원으로, 물놀이와 산책, 휴식을 즐길 수 있는 가족 친화형 녹지입니다. 앞산공원 초입에 자리해 곱창골목·카페거리와 연계한 나들이 코스로 인기가 높습니다.</li>
+          <li><strong>신천 수변 산책로</strong> — 남구 동편 경계를 남북으로 흐르는 신천을 따라 조성된 수변 산책로와 자전거길로, 도심 한복판에서 물길을 곁에 두고 걷거나 달릴 수 있는 열린 공간입니다. 봄이면 벚꽃과 유채가 어우러져 시민들의 일상 휴식처가 됩니다.</li>
+        </ul>
+      </section>
+      <section id="r-transport">
+        <h2>교통</h2>
+        <p>남구는 대구도시철도 1호선과 3호선이 함께 지나 도심 접근성이 좋습니다. 1호선은 서부정류장역·안지랑역·현충로역·교대역 등이 남구를 통과하며, 특히 안지랑역은 안지랑 곱창골목 입구까지 걸어서 3분 거리로 관광객이 많이 이용합니다. 모노레일인 3호선은 명덕역·건들바위역·대봉교역 방면으로 남구 북부를 지나 도심과 연결됩니다. 도로로는 신천을 따라 이어지는 신천대로와 명덕로, 대명로, 앞산순환로가 간선축을 이루어 중구·수성구·달서구로 빠르게 오갈 수 있습니다. 앞산공원 방면으로는 앞산순환로와 함께 앞산 케이블카가 운행해 전망대까지 편하게 오를 수 있습니다. 도심 한복판이면서도 지하철 두 노선과 신천대로가 교차해 대구 어느 방향으로도 이동이 수월한 편입니다.</p>
+      </section>
+      <section id="r-symbols">
+        <h2>지역 상징</h2>
+        <ul class="symbols">
+          <li>구화(꽃): 개나리</li>
+          <li>구목(나무): 이팝나무</li>
+          <li>구조(새): 까치</li>
+        </ul>
+      </section>
+      <section id="r-faq">
+        <h2>자주 묻는 질문</h2>
+        <div class="faq">
+          <details>
+            <summary>대구 남구를 대표하는 먹거리는 무엇인가요?</summary>
+            <p>안지랑 곱창골목이 남구의 대표 먹거리입니다. 돼지곱창과 막창을 저렴하고 푸짐하게 내는 60여 개 상가가 모여 있으며, 2018년 &#x27;한국 관광의 별&#x27;에 선정되고 전국 5대 음식테마거리로 지정됐습니다. 지하철 1호선 안지랑역에서 걸어서 3분 거리입니다.</p>
+          </details>
+          <details>
+            <summary>앞산 전망대는 어떻게 올라가나요?</summary>
+            <p>앞산공원의 케이블카를 이용하면 약 5분 만에 전망대에 도착합니다. 케이블카는 대체로 5~15분 간격으로 운행하며, 등산이 부담스러운 분도 편하게 대구 시가지와 야경을 감상할 수 있어 대표적인 데이트·나들이 코스로 꼽힙니다.</p>
+          </details>
+          <details>
+            <summary>대명동이라는 지명은 어디서 유래했나요?</summary>
+            <p>임진왜란 때 명나라 장수로 조선을 도우러 왔다가 귀화한 두사충이 최정산(현 대덕산) 아래로 집을 옮기고, 고국 명나라를 그리는 뜻에서 마을 이름을 &#x27;대명동(大明洞)&#x27;이라 붙였다는 유래가 전합니다. 매월 초하루 고국을 향해 배례를 올렸다고 전해지는 남구만의 역사 이야기입니다.</p>
+          </details>
+          <details>
+            <summary>남구는 언제 자치구로 설치됐나요?</summary>
+            <p>1963년 1월 1일 대구시에 구제(區制)가 실시되면서 남구가 정식으로 설치됐습니다. 1981년 직할시 승격 때 관할이 넓어졌다가 1988년 달서구가 분리되며 지금의 규모가 됐고, 1995년 대구광역시 남구로 명칭이 바뀌었습니다.</p>
+          </details>
+          <details>
+            <summary>남구에는 어떤 대학이 있나요?</summary>
+            <p>대명동에 국립 대구교육대학교와 사립 전문대학인 영남이공대학교가 있습니다. 영남이공대학교는 1968년 설립됐으며 전문대학 부문 고객만족도 조사에서 여러 해 상위권을 기록했습니다. 두 대학 덕분에 남구는 청년 유동이 활발한 교육 중심 자치구입니다.</p>
+          </details>
+          <details>
+            <summary>앞산공원에서 볼 수 있는 문화·역사 명소는 무엇인가요?</summary>
+            <p>앞산공원 안에는 6·25 낙동강 전투 승리를 기념하는 낙동강 승전기념관, 왕건 설화가 깃든 고찰 은적사, 공룡 발자국 화석이 남은 고산골 공룡화석지와 조각공원 등이 있습니다. 산책과 역사·자연 학습을 함께 즐길 수 있는 남구의 핵심 공간입니다.</p>
+          </details>
+        </div>
+      </section>
+      <section id="r-links">
+        <h2>공식 링크</h2>
+        <ul>
+          <li><a href="https://www.nam.daegu.kr/" rel="noopener">대구광역시 남구청</a></li>
+          <li><a href="https://www.nam.daegu.kr/tour/index.do" rel="noopener">대구광역시 남구 문화관광</a></li>
+        </ul>
+      </section>
+      <section id="r-github">
+        <h2>GitHub</h2>
+        <ul>
+          <li><a href="https://github.com/kr-daegu-nam" rel="noopener">GitHub 조직: kr-daegu-nam</a></li>
+          <li><a href="https://github.com/kr-daegu-nam/kr-daegu-nam.github.io" rel="noopener">이 사이트 저장소</a></li>
+        </ul>
+      </section>
+      <section id="r-sources">
+        <h2>출처</h2>
+        <ul class="sources">
+          <li><a href="https://ko.wikipedia.org/wiki/%EB%82%A8%EA%B5%AC_(%EB%8C%80%EA%B5%AC%EA%B4%91%EC%97%AD%EC%8B%9C)" rel="noopener">남구 (대구광역시) - 위키백과</a> (조회 2026-07-08)</li>
+          <li><a href="https://nam.daegu.kr/tour/index.do?menu_id=00001676" rel="noopener">대구광역시 남구 문화관광 - 안지랑 곱창골목</a> (조회 2026-07-08)</li>
+          <li><a href="https://nam.daegu.kr/index.do?menu_id=00000936" rel="noopener">대구광역시 남구청 - 지명유래</a> (조회 2026-07-08)</li>
+          <li><a href="https://daegu.grandculture.net/daegu/toc/GC40000627" rel="noopener">앞산공원 - 대구역사문화대전</a> (조회 2026-07-08)</li>
+          <li><a href="https://www.dpi.re.kr/board/view?menuId=MENU002020803000000&amp;boardId=BOARD00097" rel="noopener">대구정책연구원 - 대구 인구 이야기(2024년 12월 기준)</a> (조회 2026-07-08)</li>
+        </ul>
+      </section>
+    </div>
+  </main>
   <aside class="cg-sponsors" aria-label="후원 파트너 상세">
     <p class="cg-spon-head"><span class="cg-ad">AD</span> 후원 파트너 <small>이 링크는 광고이며 편집상의 추천이 아닙니다 (rel=&quot;sponsored&quot;).</small></p>
     <ul class="cg-spon-grid">
