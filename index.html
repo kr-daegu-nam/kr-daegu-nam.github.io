@@ -221,360 +221,348 @@
 </head>
 <body>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Nanum+Pen+Script&family=Pacifico&display=swap');
 
-  :root{
-    --nam-burgundy:#7B1113;
-    --nam-burgundy-deep:#4a0a0b;
-    --nam-gold:#E8C060;
-    --nam-gold-soft:#f4dfa0;
-    --nam-ink:#1a0c0d;
-    --nam-cream:#fbf5ea;
-    --nam-stage:#120607;
-  }
+/* ============================================================
+   대구 남구 · 앞산 타임랩스 (Time-lapse)
+   컨셉: 스크롤 진행에 따라 주간→야간 컬러가 블렌딩되며
+        앞산 전망·대명공연거리 감성이 페이드인
+   토큰컬러: #4B3621(대지·흙) / #FF4500(대명거리 네온·석양)
+   폰트: 나눔손글씨(Nanum Pen), Noto Sans KR, Pacifico
+   쉐입: 20px soft curve / 모션: 주야간 컬러 블렌딩 페이드
+   ============================================================ */
 
-  #nam-theater *{ box-sizing:border-box; }
+:root{
+  --nam-earth:#4B3621;        /* 대지·흙 */
+  --nam-earth-deep:#2e1f13;
+  --nam-flame:#FF4500;        /* 대명거리 네온·석양 */
+  --nam-flame-soft:#ff6a33;
+  --nam-day-sky:#f4e2c4;      /* 주간 하늘 */
+  --nam-day-sky2:#e9c79a;
+  --nam-night-sky:#120a1e;    /* 야간 하늘 */
+  --nam-night-sky2:#241539;
+  --nam-radius:20px;
+  /* --tl : 0(주간)~1(야간). JS가 스크롤로 갱신, 폴백은 주간고정 */
+  --tl:0;
+}
 
-  #nam-theater{
-    font-family:'Noto Serif KR', serif;
-    color:var(--nam-ink);
-    background:
-      radial-gradient(1100px 640px at 50% -8%, rgba(232,192,96,.14), transparent 60%),
-      linear-gradient(180deg, #f7eddb 0%, var(--nam-cream) 40%, #f5ead6 100%);
-    position:relative;
-    overflow-x:hidden;
-    line-height:1.85;
-  }
+*{box-sizing:border-box}
 
-  /* ============ STAGE / HERO ============ */
-  #nam-theater .nam-stage{
-    position:relative;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:70px 22px 90px;
-    overflow:hidden;
-    background:
-      radial-gradient(120% 80% at 50% 0%, #2a1012 0%, #1a0809 55%, var(--nam-stage) 100%);
-    color:var(--nam-cream);
-  }
+#nam-root{
+  position:relative;
+  font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;
+  color:#fff;
+  line-height:1.8;
+  overflow-x:hidden;
+  /* 주간↔야간 하늘 블렌딩: --tl 로 두 색을 알파 전환 */
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--nam-day-sky) calc((1 - var(--tl)) * 100%), var(--nam-night-sky)) 0%,
+      color-mix(in srgb, var(--nam-day-sky2) calc((1 - var(--tl)) * 100%), var(--nam-night-sky2)) 46%,
+      var(--nam-earth-deep) 100%);
+  transition:background .6s linear;
+}
+/* color-mix 미지원 브라우저 폴백: 따뜻한 주간톤 */
+@supports not (background: color-mix(in srgb, red, blue)){
+  #nam-root{background:linear-gradient(180deg,var(--nam-day-sky) 0%,var(--nam-day-sky2) 46%,var(--nam-earth-deep) 100%)}
+}
 
-  /* wooden stage floor */
-  #nam-theater .nam-floor{
-    position:absolute; left:0; right:0; bottom:0; height:26vh; z-index:1;
-    background:
-      repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 2px, transparent 2px 42px),
-      linear-gradient(180deg, #3a1c14, #1c0d0a);
-    transform:perspective(340px) rotateX(52deg);
-    transform-origin:bottom;
-    box-shadow:0 -30px 60px rgba(0,0,0,.5) inset;
-    pointer-events:none;
-  }
+/* ---------- 고정 타임랩스 무대(장식) ---------- */
+.nam-stage{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+/* 태양/달 — 스크롤에 따라 지고 뜸 */
+.nam-orb{
+  position:absolute;left:50%;
+  width:clamp(90px,14vw,170px);height:clamp(90px,14vw,170px);border-radius:50%;
+  top:calc(18% + (var(--tl)) * 6%);
+  transform:translateX(-50%);
+  transition:top .6s linear, box-shadow .6s linear, background .6s linear;
+  background:
+    radial-gradient(circle at 42% 40%,
+      color-mix(in srgb, #ffe7a8 calc((1 - var(--tl)) * 100%), #e8ecff) 0%,
+      color-mix(in srgb, var(--nam-flame) calc((1 - var(--tl)) * 100%), #cfd6ff) 70%,
+      transparent 72%);
+  box-shadow:0 0 80px 20px color-mix(in srgb, rgba(255,150,60,.55) calc((1 - var(--tl)) * 100%), rgba(150,170,255,.35));
+}
+.nam-orb::after{ /* 달의 크레이터(야간에만 보임) */
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 62% 34%, rgba(120,130,180,.35) 0 8%, transparent 9%),
+             radial-gradient(circle at 38% 62%, rgba(120,130,180,.28) 0 6%, transparent 7%);
+  opacity:var(--tl);transition:opacity .6s linear;
+}
+/* 별 — 야간에 페이드인 */
+.nam-stars{position:absolute;inset:0;opacity:var(--tl);transition:opacity .8s linear}
+.nam-stars i{
+  position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;
+  animation:nam-twinkle 3.4s ease-in-out infinite;
+}
+@keyframes nam-twinkle{0%,100%{opacity:.25}50%{opacity:1}}
 
-  /* spotlight cone that tracks the pointer */
-  #nam-theater .nam-spot{
-    position:absolute; inset:0; z-index:2; pointer-events:none;
-    background:radial-gradient(circle 46vmin at var(--sx,50%) var(--sy,34%),
-      rgba(244,223,160,.30), rgba(244,223,160,.10) 30%, transparent 62%);
-    mix-blend-mode:screen;
-    transition:background .18s ease-out;
-  }
+/* 앞산 능선 실루엣(겹겹이) — 색은 주야 블렌딩 */
+.nam-ridge{position:absolute;left:0;right:0;bottom:0;width:100%}
+.nam-ridge svg{display:block;width:100%;height:auto}
+.nam-ridge--far path{fill:color-mix(in srgb, #b98a5a calc((1 - var(--tl)) * 100%), #241a33);transition:fill .6s linear}
+.nam-ridge--mid path{fill:color-mix(in srgb, #8a5f34 calc((1 - var(--tl)) * 100%), #170f24);transition:fill .6s linear}
+.nam-ridge--near path{fill:color-mix(in srgb, var(--nam-earth) calc((1 - var(--tl)) * 100%), var(--nam-earth-deep));transition:fill .6s linear}
+@supports not (background: color-mix(in srgb, red, blue)){
+  .nam-ridge--far path{fill:#b98a5a}.nam-ridge--mid path{fill:#8a5f34}.nam-ridge--near path{fill:var(--nam-earth)}
+}
+/* 능선 위 대명거리 불빛(야간 페이드인) */
+.nam-citylights{position:absolute;left:0;right:0;bottom:0;height:26%;opacity:var(--tl);transition:opacity .9s linear}
+.nam-citylights i{
+  position:absolute;bottom:0;width:2px;background:linear-gradient(180deg,var(--nam-flame),transparent);
+  animation:nam-flicker 2.6s ease-in-out infinite;
+}
+@keyframes nam-flicker{0%,100%{opacity:.5}45%{opacity:1}}
 
-  /* the two curtain halves */
-  #nam-theater .nam-curtain{
-    position:absolute; top:0; bottom:0; z-index:5; width:56%;
-    pointer-events:none;
-    background:
-      repeating-linear-gradient(90deg,
-        var(--nam-burgundy-deep) 0 22px,
-        var(--nam-burgundy) 22px 50px,
-        #921619 50px 74px,
-        var(--nam-burgundy) 74px 96px);
-    box-shadow:inset -40px 0 80px rgba(0,0,0,.5), inset 40px 0 80px rgba(0,0,0,.3);
-    transition:transform 2.1s cubic-bezier(.7,.02,.28,1);
-    will-change:transform;
-  }
-  #nam-theater .nam-curtain::after{
-    content:''; position:absolute; top:0; height:100%; width:100%;
-    background:linear-gradient(90deg, transparent, rgba(0,0,0,.35));
-  }
-  #nam-theater .nam-curtain--l{ left:0;  border-right:3px solid var(--nam-gold); }
-  #nam-theater .nam-curtain--r{ right:0; border-left:3px solid var(--nam-gold);
-    background-position:right; }
-  #nam-theater .nam-curtain--r::after{ background:linear-gradient(90deg, rgba(0,0,0,.35), transparent); }
+/* 케이블카 — 앞산 케이블카가 대각선으로 오르내림 */
+.nam-cable{position:absolute;top:24%;left:-8%;right:-8%;height:40%;opacity:.9}
+.nam-cable .wire{
+  position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:rotate(-9deg);transform-origin:left center;
+}
+.nam-car{
+  position:absolute;top:-6px;width:34px;height:20px;border-radius:6px;
+  background:color-mix(in srgb, var(--nam-flame) calc((1 - var(--tl)) * 100%), #ffcf4d);
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+  transform:rotate(-9deg);
+  animation:nam-cablecar 22s linear infinite;
+}
+.nam-car::before{content:"";position:absolute;top:-9px;left:50%;width:2px;height:9px;background:#fff9;transform:translateX(-50%)}
+@keyframes nam-cablecar{0%{left:2%}100%{left:92%}}
 
-  /* scalloped gold valance across the top */
-  #nam-theater .nam-valance{
-    position:absolute; top:0; left:0; right:0; height:64px; z-index:6;
-    background:linear-gradient(180deg, #b8912f, var(--nam-gold) 55%, #a97f22);
-    pointer-events:none;
-    box-shadow:0 6px 18px rgba(0,0,0,.4);
-  }
-  #nam-theater .nam-valance svg{ position:absolute; top:100%; left:0; width:100%; height:34px; display:block; }
+/* ---------- 시간 눈금(스크롤 진행 = 하루) ---------- */
+.nam-clock{
+  position:fixed;top:0;left:0;right:0;height:4px;z-index:40;
+  background:linear-gradient(90deg,var(--nam-day-sky) 0%,var(--nam-flame) 50%,var(--nam-night-sky2) 100%);
+  transform-origin:left;transform:scaleX(var(--tl));
+  transition:transform .2s linear;
+}
+.nam-timechip{
+  position:fixed;top:16px;right:16px;z-index:41;
+  font-family:'Nanum Pen Script',cursive;font-size:1.5rem;letter-spacing:.02em;
+  color:#fff;background:rgba(30,18,10,.5);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.18);border-radius:999px;
+  padding:6px 20px 4px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 30px -12px rgba(0,0,0,.6);
+}
+.nam-timechip .ico{font-family:'Noto Sans KR';font-size:1rem}
 
-  /* curtains open when JS adds .is-open (default openness handled below for no-JS) */
-  #nam-theater.is-open .nam-curtain--l{ transform:translateX(-102%); }
-  #nam-theater.is-open .nam-curtain--r{ transform:translateX(102%); }
+/* ============================================================
+   히어로
+   ============================================================ */
+.nam-hero{
+  position:relative;z-index:2;
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:12vh 7vw 16vh;
+}
+.nam-hero .brush{
+  font-family:'Nanum Pen Script',cursive;
+  font-size:clamp(1.6rem,4.4vw,2.9rem);color:var(--nam-flame);
+  text-shadow:0 2px 20px rgba(255,69,0,.35);margin:0 0 6px;
+  transform:rotate(-2.5deg);
+}
+.nam-hero h1{
+  font-family:'Noto Sans KR',sans-serif;font-weight:900;
+  font-size:clamp(3rem,12vw,7rem);line-height:.98;margin:0;
+  letter-spacing:-.03em;
+  color:#fff;text-shadow:0 8px 44px rgba(0,0,0,.4);
+}
+.nam-hero h1 .accent{
+  color:var(--nam-flame);
+  text-shadow:0 4px 30px rgba(255,69,0,.5);
+}
+.nam-hero .script{
+  font-family:'Pacifico',cursive;font-weight:400;
+  font-size:clamp(1rem,3vw,1.9rem);color:#ffe7c9;
+  margin:18px 0 0;letter-spacing:.01em;opacity:.95;
+}
+.nam-hero .lede{
+  max-width:600px;margin:26px 0 0;font-size:clamp(1rem,1.7vw,1.2rem);
+  color:#fff;font-weight:300;text-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.nam-scrollcue{
+  margin-top:44px;display:inline-flex;align-items:center;gap:14px;
+  font-family:'Nanum Pen Script',cursive;font-size:1.5rem;color:#fff;
+}
+.nam-scrollcue .dot{
+  width:26px;height:44px;border:2px solid rgba(255,255,255,.6);border-radius:999px;
+  position:relative;flex:none;
+}
+.nam-scrollcue .dot::after{
+  content:"";position:absolute;left:50%;top:8px;width:5px;height:5px;border-radius:50%;
+  background:var(--nam-flame);transform:translateX(-50%);animation:nam-cue 1.8s ease-in-out infinite;
+}
+@keyframes nam-cue{0%{top:8px;opacity:1}70%{top:26px;opacity:0}100%{opacity:0}}
 
-  #nam-theater .nam-stage-in{
-    position:relative; z-index:4; max-width:860px;
-    opacity:0; transform:translateY(24px);
-    transition:opacity 1s ease .9s, transform 1s ease .9s;
-  }
-  #nam-theater.is-open .nam-stage-in{ opacity:1; transform:none; }
+/* ============================================================
+   본문 래퍼 — CONTENT 토큰 (JS 꺼져도 완전 판독)
+   각 섹션이 스크롤로 페이드인, 카드형 20px soft curve
+   ============================================================ */
+.nam-wrap{
+  position:relative;z-index:2;
+  max-width:940px;margin:0 auto;padding:4vh 6vw 8vh;
+}
+.nam-source-note{
+  font-family:'Nanum Pen Script',cursive;font-size:1.5rem;
+  color:#ffe7c9;text-align:center;margin:0 0 40px;opacity:.9;
+}
 
-  #nam-theater .nam-eyebrow{
-    font-family:'Playfair Display', serif; font-style:italic; font-weight:500;
-    font-size:clamp(1.1rem,3.2vw,1.7rem);
-    color:var(--nam-gold-soft); letter-spacing:.04em; margin:0 0 10px;
-    text-shadow:0 2px 16px rgba(232,192,96,.4);
-  }
-  #nam-theater .nam-title{
-    font-family:'Noto Serif KR', serif; font-weight:900;
-    font-size:clamp(2.4rem,9vw,5.4rem); margin:0; line-height:1.04;
-    letter-spacing:-.01em;
-    color:#fff; text-shadow:0 4px 30px rgba(0,0,0,.6);
-  }
-  #nam-theater .nam-title b{
-    color:var(--nam-gold);
-    text-shadow:0 0 34px rgba(232,192,96,.55);
-  }
-  #nam-theater .nam-marquee-line{
-    font-family:'Playfair Display', serif; letter-spacing:.42em;
-    font-size:.72rem; text-transform:uppercase; color:var(--nam-gold);
-    margin:20px 0 0;
-  }
-  #nam-theater .nam-sub{
-    margin:26px auto 0; max-width:660px; font-weight:300;
-    font-size:clamp(.98rem,2.4vw,1.14rem); color:#f1e5cf;
-  }
-  #nam-theater .nam-cue{
-    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
-    z-index:4; font-size:.72rem; letter-spacing:.3em; text-transform:uppercase;
-    color:var(--nam-gold-soft);
-    display:inline-flex; flex-direction:column; align-items:center; gap:8px;
-    opacity:0; transition:opacity .8s ease 2.1s;
-  }
-  #nam-theater.is-open .nam-cue{ opacity:.85; }
-  #nam-theater .nam-cue span{ font-size:1rem; animation:namBob 1.7s ease-in-out infinite; }
-  @keyframes namBob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(5px);} }
+/* 섹션 공통 — 유리판 카드 위 텍스트 */
+.nam-wrap section{
+  position:relative;
+  background:rgba(28,18,11,.42);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--nam-radius);
+  padding:34px clamp(20px,4vw,42px);
+  margin:0 0 28px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 26px 60px -30px rgba(0,0,0,.7);
+}
+/* 페이드인 초기상태는 JS 켜진 경우에만(JS 꺼지면 항상 보임 = SEO 보존) */
+#nam-root.js-on .nam-wrap section{
+  opacity:0;transform:translateY(34px);
+  transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1);
+}
+#nam-root.js-on .nam-wrap section.nam-lit{opacity:1;transform:none}
 
-  /* manual open button for keyboard / no-pointer */
-  #nam-theater .nam-open-btn{
-    position:absolute; z-index:7; bottom:40px; left:50%; transform:translateX(-50%);
-    font-family:'Playfair Display', serif; letter-spacing:.18em; text-transform:uppercase;
-    font-size:.78rem; color:var(--nam-burgundy-deep);
-    background:var(--nam-gold); border:none; border-radius:999px;
-    padding:12px 26px; cursor:pointer;
-    box-shadow:0 6px 20px rgba(0,0,0,.4);
-    transition:opacity .6s ease, transform .2s ease;
-  }
-  #nam-theater .nam-open-btn:hover{ transform:translateX(-50%) translateY(-2px); }
-  #nam-theater.is-open .nam-open-btn{ opacity:0; pointer-events:none; }
+.nam-wrap h2{
+  font-family:'Noto Sans KR',sans-serif;font-weight:900;
+  font-size:clamp(1.4rem,3.4vw,2rem);color:#fff;margin:0 0 16px;
+  letter-spacing:-.01em;display:flex;align-items:baseline;gap:14px;
+}
+.nam-wrap h2::before{
+  content:attr(data-idx);
+  font-family:'Pacifico',cursive;font-weight:400;font-size:1rem;
+  color:var(--nam-flame);flex:none;
+}
+.nam-wrap p{color:#f3e7d8;margin:0 0 14px;font-weight:300}
+.nam-wrap p:last-child{margin-bottom:0}
+.nam-wrap a{color:var(--nam-flame-soft);text-decoration:underline;text-underline-offset:3px}
+.nam-wrap a:hover{color:#fff}
+.nam-wrap ul{padding-left:0;margin:14px 0 0;list-style:none}
+.nam-wrap li{margin:0 0 12px;color:#f3e7d8}
 
-  /* ============ ACT INTRO STRIP ============ */
-  #nam-theater .nam-acts{
-    text-align:center; padding:64px 22px 8px; max-width:820px; margin:0 auto;
-  }
-  #nam-theater .nam-acts .nam-kr{
-    font-family:'Playfair Display', serif; font-style:italic; color:var(--nam-burgundy);
-    font-size:clamp(1.2rem,4vw,1.9rem); margin:0;
-  }
-  #nam-theater .nam-acts h2{
-    font-size:clamp(1.4rem,4.4vw,2.2rem); margin:.2em 0 .4em;
-    color:var(--nam-burgundy-deep); font-weight:900;
-  }
-  #nam-theater .nam-acts p{ margin:0 auto; max-width:620px; color:#5a4038; font-weight:300; }
+/* 명소/문화/자연 리스트 아이템(강조) */
+.nam-wrap section[id="landmarks"] li,
+.nam-wrap section[id="heritage"] li,
+.nam-wrap section[id="nature"] li{
+  background:rgba(75,54,33,.35);
+  border-left:3px solid var(--nam-flame);
+  border-radius:12px;padding:14px 18px;margin:0 0 12px;
+}
+.nam-wrap li strong{color:#fff;font-weight:700;display:inline}
 
-  /* ============ CONTENT SECTIONS AS PLAYBILL ACTS ============ */
-  #nam-theater .nam-content{
-    max-width:940px; margin:38px auto 0; padding:0 clamp(16px,4vw,30px);
-  }
-  #nam-theater .nam-content section{
-    position:relative;
-    background:#fff;
-    border-radius:4px;
-    padding:34px 34px 30px 38px;
-    margin:0 0 30px;
-    box-shadow:0 14px 40px rgba(74,10,11,.12);
-    border:1px solid rgba(123,17,19,.1);
-    border-top:4px solid var(--nam-gold);
-    overflow:hidden;
-    opacity:1;               /* readable without JS */
-    transform:none;
-  }
-  /* JS-enhanced reveal (only applied when .js-reveal present) */
-  #nam-theater .nam-content.js-reveal section{
-    opacity:0; transform:translateY(34px) scale(.985);
-    transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);
-  }
-  #nam-theater .nam-content.js-reveal section.nam-lit{
-    opacity:1; transform:none;
-  }
-  /* per-section spotlight wash on reveal */
-  #nam-theater .nam-content section::before{
-    content:''; position:absolute; top:-40%; left:50%; width:150%; height:120%;
-    transform:translateX(-50%);
-    background:radial-gradient(closest-side, rgba(232,192,96,.16), transparent 70%);
-    opacity:0; transition:opacity .9s ease; pointer-events:none;
-  }
-  #nam-theater .nam-content section.nam-lit::before{ opacity:1; }
+/* facts / symbols — 카드 그리드 */
+.nam-wrap .facts,.nam-wrap .symbols{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px;list-style:none;padding:0;margin:16px 0 0;
+}
+.nam-wrap .facts li,.nam-wrap .symbols li{
+  background:linear-gradient(150deg,rgba(255,69,0,.16),rgba(75,54,33,.3));
+  border:1px solid rgba(255,255,255,.14);border-radius:16px;
+  padding:18px;margin:0;text-align:center;color:#fff;
+  box-shadow:0 12px 30px -20px rgba(0,0,0,.7);
+}
+.nam-wrap .facts li strong,.nam-wrap .symbols li strong{
+  display:block;font-family:'Nanum Pen Script',cursive;font-size:1.4rem;
+  color:var(--nam-flame-soft);margin-bottom:2px;
+}
 
-  /* the act number in the margin */
-  #nam-theater .nam-content section::after{
-    content:attr(data-act);
-    position:absolute; top:14px; right:20px;
-    font-family:'Playfair Display', serif; font-weight:900;
-    font-size:2.4rem; color:rgba(123,17,19,.08); line-height:1;
-    pointer-events:none;
-  }
+/* FAQ (details/summary) */
+.nam-wrap .faq{margin-top:14px}
+.nam-wrap details{
+  background:rgba(75,54,33,.32);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:4px 20px;margin:0 0 12px;
+}
+.nam-wrap summary{
+  cursor:pointer;font-weight:700;color:#fff;padding:14px 0;list-style:none;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+}
+.nam-wrap summary::-webkit-details-marker{display:none}
+.nam-wrap summary::after{
+  content:"+";font-family:'Pacifico',cursive;color:var(--nam-flame);
+  font-size:1.4rem;transition:.3s;line-height:1;
+}
+.nam-wrap details[open] summary::after{transform:rotate(45deg)}
+.nam-wrap details p{padding:0 0 14px}
 
-  #nam-theater .nam-content section h2{
-    font-family:'Noto Serif KR', serif; font-weight:700;
-    font-size:clamp(1.2rem,3vw,1.5rem); margin:0 0 .55em;
-    color:var(--nam-burgundy); display:flex; align-items:center; gap:.5em;
-    position:relative; z-index:1;
-  }
-  #nam-theater .nam-content section h2::before{
-    content:''; width:12px; height:12px; flex:0 0 auto;
-    background:var(--nam-gold);
-    clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
-  }
-  #nam-theater .nam-content section p{ margin:.5em 0; color:#2e1c1a; position:relative; z-index:1; }
-  #nam-theater .nam-content section a{
-    color:var(--nam-burgundy); text-decoration:none;
-    border-bottom:1px solid var(--nam-gold);
-  }
-  #nam-theater .nam-content section a:hover{ color:var(--nam-burgundy-deep); background:rgba(232,192,96,.18); }
+/* sources / github / links */
+.nam-wrap .sources{font-size:.9rem;color:#d9c9b6}
+.nam-wrap .sources li,.nam-wrap section[id="links"] li,.nam-wrap section[id="github"] li{
+  background:none;border:none;padding:0;border-left:none;margin:0 0 8px;border-radius:0;
+}
 
-  /* landmark / heritage / nature lists as billed acts */
-  #nam-theater .nam-content section ul{ list-style:none; padding:0; margin:.6em 0 0; }
-  #nam-theater .nam-content section > ul > li{
-    padding:12px 14px 12px 18px; margin:.5em 0;
-    background:linear-gradient(90deg, rgba(232,192,96,.12), transparent);
-    border-left:3px solid var(--nam-gold);
-    border-radius:0 6px 6px 0;
-  }
-  #nam-theater .nam-content section li strong,
-  #nam-theater .nam-content section li b{ color:var(--nam-burgundy); font-weight:700; }
+/* ============================================================
+   푸터
+   ============================================================ */
+.nam-foot{
+  position:relative;z-index:2;text-align:center;
+  padding:40px 6vw 70px;color:#e9d6c1;
+}
+.nam-foot .brush{font-family:'Nanum Pen Script',cursive;font-size:1.7rem;color:var(--nam-flame-soft);margin:0}
+.nam-foot p{font-size:.86rem;margin:8px 0 0;opacity:.8}
 
-  /* facts + symbols as ticket chips */
-  #nam-theater .nam-content .facts,
-  #nam-theater .nam-content .symbols{
-    list-style:none; padding:0; margin:.6em 0 0;
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;
-  }
-  #nam-theater .nam-content .facts li,
-  #nam-theater .nam-content .symbols li{
-    background:var(--nam-burgundy); color:var(--nam-gold-soft);
-    border-radius:8px; padding:12px 14px; margin:0; font-size:.92rem;
-    border-left:none; position:relative;
-    box-shadow:0 4px 12px rgba(74,10,11,.18);
-  }
-  #nam-theater .nam-content .facts li strong,
-  #nam-theater .nam-content .symbols li strong{ color:#fff; display:block; font-weight:400; }
+/* 접근성: 모션 최소화 */
+@media (prefers-reduced-motion:reduce){
+  .nam-stars i,.nam-car,.nam-citylights i,.nam-scrollcue .dot::after{animation:none}
+  #nam-root.js-on .nam-wrap section{opacity:1 !important;transform:none !important;transition:none}
+  #nam-root,.nam-orb,.nam-ridge--far path,.nam-ridge--mid path,.nam-ridge--near path{transition:none}
+}
 
-  /* FAQ as programme notes */
-  #nam-theater .nam-content .faq details{
-    background:var(--nam-cream); border:1px solid rgba(123,17,19,.16);
-    border-radius:8px; padding:2px 16px; margin:10px 0;
-  }
-  #nam-theater .nam-content .faq summary{
-    cursor:pointer; padding:12px 0; font-weight:500; color:var(--nam-burgundy);
-    list-style:none; font-size:1.02rem;
-  }
-  #nam-theater .nam-content .faq summary::-webkit-details-marker{ display:none; }
-  #nam-theater .nam-content .faq summary::before{ content:'\25C6\00A0'; color:var(--nam-gold); }
-  #nam-theater .nam-content .faq details[open] summary{ color:var(--nam-burgundy-deep); }
-  #nam-theater .nam-content .faq details p{ margin:.2em 0 .8em; color:#4a3330; }
-
-  /* section variant tint for landmarks group */
-  #nam-theater .nam-content section#landmarks,
-  #nam-theater .nam-content section#cultural_heritage{
-    border-top-color:var(--nam-burgundy);
-  }
-
-  /* ============ CODA ============ */
-  #nam-theater .nam-coda{
-    text-align:center; margin-top:26px; padding:70px 22px 84px;
-    background:
-      radial-gradient(120% 90% at 50% 120%, #2a1012 0%, #1a0809 60%, var(--nam-stage) 100%);
-    color:var(--nam-cream);
-    position:relative; overflow:hidden;
-  }
-  #nam-theater .nam-coda .nam-kr{
-    font-family:'Playfair Display', serif; font-style:italic;
-    color:var(--nam-gold); font-size:clamp(1.2rem,4vw,1.8rem);
-  }
-  #nam-theater .nam-coda h3{ color:#fff; margin:.2em 0; font-size:clamp(1.5rem,5vw,2.3rem); font-weight:900; }
-  #nam-theater .nam-coda p{ color:#e9d9bd; max-width:580px; margin:.5em auto 0; font-weight:300; }
-  #nam-theater .nam-coda .nam-links{ margin-top:22px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
-  #nam-theater .nam-coda .nam-links a{
-    color:var(--nam-burgundy-deep); background:var(--nam-gold);
-    font-family:'Playfair Display', serif; letter-spacing:.06em;
-    text-decoration:none; padding:11px 22px; border-radius:999px; font-size:.9rem;
-  }
-  #nam-theater .nam-coda .nam-links a:hover{ background:var(--nam-gold-soft); }
-
-  /* ============ RESPONSIVE ============ */
-  @media (max-width:640px){
-    #nam-theater .nam-curtain{ width:60%; }
-    #nam-theater .nam-content section{ padding:26px 22px 24px 24px; }
-    #nam-theater .nam-content section::after{ font-size:1.8rem; }
-  }
-  @media (prefers-reduced-motion:reduce){
-    #nam-theater .nam-curtain{ transition:none; }
-    #nam-theater .nam-stage-in{ transition:none; opacity:1; transform:none; }
-    #nam-theater .nam-content.js-reveal section{ transition:none; opacity:1; transform:none; }
-    #nam-theater .nam-cue span{ animation:none; }
-  }
+/* 반응형 */
+@media (max-width:640px){
+  .nam-hero{padding:14vh 8vw 14vh}
+  .nam-timechip{font-size:1.2rem;padding:5px 15px 3px}
+  .nam-wrap section{padding:26px 20px}
+  .nam-cable{display:none}
+}
 </style>
 
-<div id="nam-theater">
+<div id="nam-root">
 
-  <!-- ============ STAGE / HERO ============ -->
-  <header class="nam-stage" id="nam-stage">
-    <div class="nam-floor" aria-hidden="true"></div>
-    <div class="nam-spot" id="nam-spot" aria-hidden="true"></div>
+  <!-- ===== 고정 타임랩스 무대(장식) ===== -->
+  <div class="nam-stage" aria-hidden="true">
+    <div class="nam-stars" id="nam-stars"></div>
+    <div class="nam-orb"></div>
 
-    <div class="nam-stage-in">
-      <p class="nam-eyebrow">막이 오릅니다 &mdash; 대명공연거리에서</p>
-      <h1 class="nam-title">대구광역시<br><b>남구</b></h1>
-      <p class="nam-marquee-line">Now Playing &middot; kr-daegu-nam</p>
-      <p class="nam-sub">남구는 대구의 상징인 앞산이 병풍처럼 남쪽을 감싸고, 신천이 동쪽 경계를 따라 흐르는 도심 속 주거·문화 자치구입니다. 안지랑 곱창골목과 앞산카페거리로 대표되는 서민형 먹거리 문화, 대명동 일대의 공연예술 생태계, 이천동 고미술거리의 옛 정취가 어우러져 &#x27;남다른 남구&#x27;라는 별칭을 얻었습니다. 임진왜란 때 귀화한 명나라 장수 두사충이 고국을 그리며 이름 붙였다는 대명동(大明洞) 지명 유래는 전국 어디에도 없는 남구만의 이야기입니다. 대구교육대학교와 영남이공대학교가 자리 잡아 젊은 층 유동이 활발하고, 앞산 케이블카와 전망대는 대구 야경 명소로 이름이 높습니다. 면적은 17.5㎢로 대구 자치구 중에서도 아담하지만, 산과 하천과 문화가 촘촘히 밀집한 것이 남구의 매력입니다.</p>
+    <!-- 앞산 케이블카 -->
+    <div class="nam-cable">
+      <span class="wire"></span>
+      <span class="nam-car"></span>
     </div>
 
-    <div class="nam-cue" aria-hidden="true">
-      스크롤하여 무대 안으로
-      <span>&#9660;</span>
+    <!-- 앞산 능선 겹겹이 -->
+    <div class="nam-ridge nam-ridge--far">
+      <svg viewBox="0 0 1440 220" preserveAspectRatio="none"><path d="M0,220 L0,150 C180,90 300,140 460,100 C640,55 780,150 960,110 C1140,70 1280,140 1440,120 L1440,220 Z"/></svg>
     </div>
-
-    <!-- gold valance + scalloped hem -->
-    <div class="nam-valance" aria-hidden="true">
-      <svg viewBox="0 0 1440 34" preserveAspectRatio="none">
-        <path d="M0,0 Q30,34 60,0 T120,0 T180,0 T240,0 T300,0 T360,0 T420,0 T480,0 T540,0 T600,0 T660,0 T720,0 T780,0 T840,0 T900,0 T960,0 T1020,0 T1080,0 T1140,0 T1200,0 T1260,0 T1320,0 T1380,0 T1440,0 L1440,0 L0,0 Z" fill="#a97f22"/>
-      </svg>
+    <div class="nam-ridge nam-ridge--mid">
+      <svg viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0,200 L0,140 C160,110 260,60 420,110 C600,165 760,80 940,130 C1120,175 1290,100 1440,150 L1440,200 Z"/></svg>
     </div>
-
-    <!-- red curtain halves -->
-    <div class="nam-curtain nam-curtain--l" aria-hidden="true"></div>
-    <div class="nam-curtain nam-curtain--r" aria-hidden="true"></div>
-
-    <button class="nam-open-btn" id="nam-open-btn" type="button">막 올리기 &#9656;</button>
-  </header>
-
-  <!-- ============ ACT INTRO ============ -->
-  <div class="nam-acts">
-    <p class="nam-kr">The Programme</p>
-    <h2>앞산이 굽어보는 남구의 무대</h2>
-    <p>대명공연거리의 소극장 불빛처럼, 남구의 아홉 장면이 스포트라이트를 받으며 차례로 등장합니다. 아래 모든 이야기는 스크립트 없이도 그대로 읽힙니다.</p>
+    <div class="nam-citylights" id="nam-citylights"></div>
+    <div class="nam-ridge nam-ridge--near">
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="none"><path d="M0,160 L0,110 C200,140 340,70 520,100 C720,132 860,60 1060,100 C1220,132 1330,110 1440,120 L1440,160 Z"/></svg>
+    </div>
   </div>
 
-  <!-- ============ 9-SECTION CANONICAL CONTENT (crawlable, no-JS safe) ============ -->
-  <div class="nam-content" id="nam-content">
+  <!-- 하루의 진행(스크롤) 눈금 -->
+  <div class="nam-clock" aria-hidden="true"></div>
+  <div class="nam-timechip" id="nam-timechip" aria-hidden="true"><span class="ico">&#9728;&#65038;</span><span id="nam-timetext">한낮</span></div>
+
+  <!-- ===== 히어로 ===== -->
+  <header class="nam-hero">
+    <p class="brush">대구광역시 · 앞산이 감싸는 하루</p>
+    <h1>남구<span class="accent">.</span></h1>
+    <p class="script">Apsan Time-lapse · Daegu Nam-gu</p>
+    <p class="lede">한낮의 곱창골목에서 해질녘 앞산 전망대로, 그리고 대명공연거리의 밤으로 — 아래로 내려갈수록 남구의 하루가 주간에서 야간으로 물듭니다.</p>
+    <div class="nam-scrollcue"><span class="dot"></span> 스크롤하면 해가 집니다</div>
+  </header>
+
+  <!-- ===== 실제 SEO 본문 (JS 꺼져도 완전 판독) ===== -->
+  <div class="nam-wrap" id="nam-source">
+    <p class="nam-source-note">해가 뜨고 지는 남구의 하루 — 아래 이야기를 천천히 읽어 내려가 보세요</p>
           <section id="intro">
         <h2>지역 소개</h2>
         <p>남구는 대구의 상징인 앞산이 병풍처럼 남쪽을 감싸고, 신천이 동쪽 경계를 따라 흐르는 도심 속 주거·문화 자치구입니다. 안지랑 곱창골목과 앞산카페거리로 대표되는 서민형 먹거리 문화, 대명동 일대의 공연예술 생태계, 이천동 고미술거리의 옛 정취가 어우러져 &#x27;남다른 남구&#x27;라는 별칭을 얻었습니다. 임진왜란 때 귀화한 명나라 장수 두사충이 고국을 그리며 이름 붙였다는 대명동(大明洞) 지명 유래는 전국 어디에도 없는 남구만의 이야기입니다. 대구교육대학교와 영남이공대학교가 자리 잡아 젊은 층 유동이 활발하고, 앞산 케이블카와 전망대는 대구 야경 명소로 이름이 높습니다. 면적은 17.5㎢로 대구 자치구 중에서도 아담하지만, 산과 하천과 문화가 촘촘히 밀집한 것이 남구의 매력입니다.</p>
@@ -693,126 +681,125 @@
       </section>
   </div>
 
-  <!-- ============ CODA ============ -->
-  <footer class="nam-coda">
-    <div class="nam-kr">Curtain Call</div>
-    <h3>대구광역시 남구</h3>
-    <p>앞산 자락과 대명공연거리의 밤, 커튼콜의 박수가 남는 곳.</p>
-    <div class="nam-links">
-      <a href="https://kr-daegu-nam.github.io/">https://kr-daegu-nam.github.io/</a>
-    </div>
+  <footer class="nam-foot">
+    <p class="brush">남다른 남구, 앞산의 밤이 깊어갑니다</p>
+    <p>남구 지역 정보 · 대구광역시 — https://kr-daegu-nam.github.io/</p>
   </footer>
-
 </div>
 
 <script>
 (function(){
-  var root = document.getElementById('nam-theater');
-  if(!root) return;
+  "use strict";
 
-  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var root = document.getElementById('nam-root');
+  var source = document.getElementById('nam-source');
+  if(!root || !source) return;
 
-  /* ---- optional region-data (JS enhancement only; canonical text already in the DOM) ---- */
-  var data = null;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  // ---- region-data 읽기(생성기가 이미 주입한 JSON). 새로 만들지 않고 읽기만. ----
+  var region = null;
   try{
-    var dEl = document.getElementById('region-data');
-    if(dEl){ data = JSON.parse(dEl.textContent); }
-  }catch(e){ data = null; }
+    var el = document.getElementById('region-data');
+    if(el) region = JSON.parse(el.textContent);
+  }catch(e){ region = null; }
+  // (region.coords / region.sigungu 등은 향후 확장용으로 확보; 현재 UI는 스크롤 타임랩스에 집중)
 
-  /* ---------------------------------------------------------
-     1) CURTAIN OPEN
-     Curtains start closed and open shortly after load (or on
-     click / scroll / button). If JS is off, the header CSS has
-     no .is-open state -> curtains stay drawn, but the canonical
-     content below is fully readable regardless.
-  --------------------------------------------------------- */
-  var opened = false;
-  function raiseCurtain(){
-    if(opened) return;
-    opened = true;
-    root.classList.add('is-open');
+  // ---- 별 생성 ----
+  var starsWrap = document.getElementById('nam-stars');
+  if(starsWrap && !reduce){
+    var frag = document.createDocumentFragment();
+    for(var i=0;i<70;i++){
+      var s = document.createElement('i');
+      s.style.left = (Math.random()*100).toFixed(2) + '%';
+      s.style.top = (Math.random()*62).toFixed(2) + '%';
+      s.style.animationDelay = (Math.random()*3.4).toFixed(2) + 's';
+      var sc = (0.6 + Math.random()*1.4).toFixed(2);
+      s.style.transform = 'scale(' + sc + ')';
+      frag.appendChild(s);
+    }
+    starsWrap.appendChild(frag);
   }
-  var openBtn = document.getElementById('nam-open-btn');
-  if(openBtn){ openBtn.addEventListener('click', raiseCurtain); }
+
+  // ---- 대명거리 불빛(능선 위) ----
+  var cl = document.getElementById('nam-citylights');
+  if(cl){
+    var f2 = document.createDocumentFragment();
+    for(var j=0;j<44;j++){
+      var b = document.createElement('i');
+      b.style.left = (Math.random()*100).toFixed(2) + '%';
+      b.style.height = (14 + Math.random()*44).toFixed(0) + 'px';
+      b.style.opacity = (0.4 + Math.random()*0.6).toFixed(2);
+      b.style.animationDelay = (Math.random()*2.6).toFixed(2) + 's';
+      f2.appendChild(b);
+    }
+    cl.appendChild(f2);
+  }
+
+  // ---- 섹션 페이드인 향상: h2 번호 매기고 관찰 ----
+  var sections = Array.prototype.slice.call(source.querySelectorAll('section'));
+  root.classList.add('js-on'); // 페이드인 초기상태 적용(JS 켜진 경우에만)
+
+  sections.forEach(function(sec, i){
+    var h = sec.querySelector('h2');
+    if(h){ h.setAttribute('data-idx', String(i+1).padStart(2,'0')); }
+  });
+
+  if('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('nam-lit'); io.unobserve(en.target); }
+      });
+    }, {rootMargin:'0px 0px -12% 0px', threshold:0.12});
+    sections.forEach(function(sec){ io.observe(sec); });
+  }else{
+    // 관찰 미지원/모션최소화: 즉시 노출(판독·SEO 보존)
+    sections.forEach(function(sec){ sec.classList.add('nam-lit'); });
+  }
+
+  // ---- 주간→야간 블렌딩: 스크롤 진행률(0~1)을 --tl 로 ----
+  var timeText = document.getElementById('nam-timetext');
+  var timeChip = document.getElementById('nam-timechip');
+  var icoEl = timeChip ? timeChip.querySelector('.ico') : null;
+
+  function phase(t){
+    if(t < 0.16) return ['한낮','☀︎'];
+    if(t < 0.34) return ['오후','⛅'];
+    if(t < 0.52) return ['해질녘','🌇'];
+    if(t < 0.70) return ['노을','🌆'];
+    if(t < 0.86) return ['초저녁','🌙'];
+    return ['깊은 밤','✦'];
+  }
+
+  var ticking = false, lastT = -1;
+  function update(){
+    ticking = false;
+    var doc = document.documentElement;
+    var max = (doc.scrollHeight - window.innerHeight);
+    var t = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    var eased = t * t * (3 - 2 * t); // smoothstep: 낮을 조금 길게, 밤으로 부드럽게
+    if(Math.abs(eased - lastT) < 0.004) return;
+    lastT = eased;
+    root.style.setProperty('--tl', eased.toFixed(3));
+    if(timeText){
+      var p = phase(t);
+      if(timeText.textContent !== p[0]){ timeText.textContent = p[0]; if(icoEl) icoEl.textContent = p[1]; }
+    }
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(update); }
+  }
 
   if(reduce){
-    raiseCurtain();
-  } else {
-    // auto-raise once the page has settled
-    window.setTimeout(raiseCurtain, 650);
-    // also raise on first interaction
-    window.addEventListener('scroll', raiseCurtain, {passive:true, once:true});
-    root.addEventListener('pointerdown', raiseCurtain, {once:true});
+    // 모션최소화: 은은한 석양 고정
+    root.style.setProperty('--tl', '0.35');
+    if(timeText){ timeText.textContent = '해질녘'; if(icoEl) icoEl.textContent = '🌇'; }
+  }else{
+    window.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', onScroll, {passive:true});
+    update();
   }
 
-  /* ---------------------------------------------------------
-     2) POINTER-TRACKING SPOTLIGHT on the stage
-  --------------------------------------------------------- */
-  var stage = document.getElementById('nam-stage');
-  var spot  = document.getElementById('nam-spot');
-  if(stage && spot && !reduce && window.matchMedia('(pointer:fine)').matches){
-    stage.addEventListener('pointermove', function(ev){
-      var r = stage.getBoundingClientRect();
-      var x = ((ev.clientX - r.left) / r.width) * 100;
-      var y = ((ev.clientY - r.top) / r.height) * 100;
-      spot.style.setProperty('--sx', x.toFixed(1) + '%');
-      spot.style.setProperty('--sy', y.toFixed(1) + '%');
-    });
-    // gentle idle sweep before the pointer moves
-    var idle = 0, sweeping = true, rafId;
-    function sweep(){
-      if(!sweeping) return;
-      idle += 0.012;
-      var sx = 50 + Math.sin(idle) * 24;
-      var sy = 32 + Math.cos(idle * 0.8) * 8;
-      spot.style.setProperty('--sx', sx.toFixed(1) + '%');
-      spot.style.setProperty('--sy', sy.toFixed(1) + '%');
-      rafId = requestAnimationFrame(sweep);
-    }
-    sweep();
-    stage.addEventListener('pointermove', function(){ sweeping = false; if(rafId) cancelAnimationFrame(rafId); }, {once:true});
-  }
-
-  /* ---------------------------------------------------------
-     3) SPOTLIGHT REVEAL of the playbill acts
-     Enhancement only: add .js-reveal so sections start hidden,
-     then light each one as it scrolls into view. Number each
-     act (data-act) for the playbill margin numeral.
-  --------------------------------------------------------- */
-  var content = document.getElementById('nam-content');
-  if(content){
-    var acts = Array.prototype.slice.call(content.querySelectorAll(':scope > section'));
-    acts.forEach(function(sec, i){
-      // roman numeral for the playbill margin (Act I, Act II, ...)
-      sec.setAttribute('data-act', toRoman(i + 1));
-    });
-
-    if(!reduce && 'IntersectionObserver' in window){
-      content.classList.add('js-reveal');
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(en){
-          if(en.isIntersecting){
-            en.target.classList.add('nam-lit');
-            io.unobserve(en.target);
-          }
-        });
-      }, {threshold:0.16, rootMargin:'0px 0px -8% 0px'});
-      acts.forEach(function(sec){ io.observe(sec); });
-      // safety: if IO never fires (e.g. very tall first paint), light everything after a beat
-      window.setTimeout(function(){
-        acts.forEach(function(sec){ sec.classList.add('nam-lit'); });
-      }, 2600);
-    }
-  }
-
-  function toRoman(num){
-    var map = [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
-    var out = '';
-    for(var k=0;k<map.length;k++){
-      while(num >= map[k][0]){ out += map[k][1]; num -= map[k][0]; }
-    }
-    return out || 'I';
-  }
 })();
 </script>
 </body>
